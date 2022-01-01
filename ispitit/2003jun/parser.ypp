@@ -1,0 +1,120 @@
+%{
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <map>
+
+#include "matrica.hpp"
+
+
+#define YYDEBUG 0
+
+using namespace std;
+
+extern int yylex();
+
+void yyerror(string msg) {
+	cerr << msg << endl;
+	exit(EXIT_FAILURE);
+}
+
+map<string, Matrica> tablica_simbola;
+
+#include "parser.tab.hpp"
+%}
+
+%union { 
+	double d;
+	vector<double>* v;
+	Matrica* m;
+	string* s;
+}
+
+%token <s> ID
+%token <d> NUM
+%token PM_TOKEN
+
+%type <v> Red
+%type <m> NizRedova M E
+
+%left '+' '-'
+%left PM_TOKEN
+%left '*'
+%nonassoc '\''
+
+%%
+Program: Program Naredba { } 
+  | Naredba { }
+  ;
+Naredba: ID '=' E '\n' {
+	tablica_simbola[*$1] = *$3;
+	cout << *$1 << " = " << endl << *$3;
+	delete $1;
+	delete $3;
+  }
+  | ID '=' E ';' '\n' {
+	tablica_simbola[*$1] = *$3;
+	delete $1;
+	delete $3;
+  }
+  ;
+E : M { $$ = $1; }
+  | ID { 
+	$$ = new Matrica(tablica_simbola[*$1]);
+	delete $1;
+  }
+  | E '+' E { 
+	$$ = new Matrica(*$1 + *$3);
+	delete $1;
+	delete $3;
+  }
+  | E '-' E { 
+	$$ = new Matrica(*$1 - *$3);
+	delete $1;
+	delete $3;
+  }
+  | E '*' E { 
+	$$ = new Matrica(*$1 * *$3);
+	delete $1;
+	delete $3;
+  }
+  | E PM_TOKEN E { 
+	$$ = new Matrica($1->pm(*$3));
+	delete $1;
+	delete $3;
+  }
+  | E '\''{ 
+	$$ = new Matrica($1->trans());
+	delete $1;
+  }
+  ; 
+M : '[' NizRedova ']' { $$ = $2;}
+  ;
+NizRedova: NizRedova ';' Red {
+	$1->dodajRed(*$3);
+	$$ = $1;
+	delete $3;
+  }
+  | Red { 
+	$$ = new Matrica(*$1);
+	delete $1;
+  } 
+  ; 
+Red: Red  NUM {
+	$1->push_back($2);
+	$$ = $1;
+  }
+  | NUM {
+	$$ = new vector<double>();
+	$$->push_back($1);
+  }
+  ;
+%%
+
+int main() {
+	//yydebug = 1;
+	return yyparse();
+}
+
+

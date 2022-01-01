@@ -1,0 +1,71 @@
+
+%{
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <map>
+
+#include "04.tab.hpp"
+
+#define YYDEBUG 0
+
+using namespace std;
+
+extern int yylex();
+
+void yyerror(string msg) {
+	cerr << msg << endl;
+	exit(EXIT_FAILURE);
+}
+
+map<string, double> tablica_simbola;
+
+%}
+
+%union {
+	double d;
+	std::string *s;
+}
+
+%token<d> NUM
+%token<s> ID
+
+%type <d> E T F
+
+%start NN
+
+%%
+NN: NN N
+  | N
+  ;
+N : E ';'{ cout << "Vrednost izraza je " << $1 << endl; }
+  | ID '=' E ';' { 
+	tablica_simbola[*$1] = $3;
+	delete $1;}
+  ;
+E : E '+' T { $$ = $1 + $3; }
+  | T { $$ = $1; }
+  ;
+T : T '*' F { $$ = $1 * $3; }
+  | F { $$ = $1; }
+  ;
+F : '(' E ')' { $$ = $2; }
+  | NUM { $$ = $1; }
+  | ID {
+	map<string, double>::iterator i = tablica_simbola.find(*$1);
+	if(i == tablica_simbola.end()) {
+		yyerror("Promenljiva " + *$1 + " nije definisana");
+	}
+	else {
+	 	$$ = i->second;
+	}
+	delete $1; }
+  ;
+%%
+
+int main() {
+	//yydebug = 1;
+	return yyparse();
+}
+
+

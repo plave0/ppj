@@ -1,0 +1,123 @@
+%{
+
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <map>
+#include <unordered_map>
+
+#define YYDEBUG 1
+
+using namespace std;
+
+extern int yylex();
+void yyerror(string msg) {
+	cerr << msg << endl;
+	exit(EXIT_FAILURE);
+}
+
+map<string, unordered_map<int, vector<int> > > id_table;
+
+%}
+
+%union {
+	int node_id;
+	string* graph_id;
+	vector<int>* node_list;
+	pair<int, vector<int>>* node;
+	unordered_map<int, vector<int>>* graph;
+}
+
+%token GraphType Print Vertices Edges Union Intersect Difference Complement
+%token IsGraph IsUndirected IsConnected
+%token <graph_id> Id
+%token <node_id> NodeId
+
+%left Union Intersect Difference
+%nonassoc Complement
+
+%type <node_list> NodeList;
+%type <node> NV;
+%type <graph> NVList Graph GraphExp
+
+%%
+
+Prog : Prog Line ';' { }
+| Line ';' { }
+;
+Line : GraphType Id '=' GraphExp {
+}
+| Print '(' GraphExp ')' {
+	cout << '[';
+	for(auto node : *$3) {
+		cout << "(" << node.first << ") ";
+	}	
+	cout << ']' << endl;
+	delete $3;
+}
+| Vertices Id {
+}
+| Edges Id NodeId { 
+}
+| IsGraph GraphExp {
+}
+| IsUndirected GraphExp {
+}
+| IsConnected GraphExp NodeId NodeId {
+}
+;
+GraphExp : Graph { 
+	$$ = $1;
+}
+| Id { 
+	$$ = new unordered_map<int, vector<int> >(id_table[*$1]);
+	delete $1;
+}
+| GraphExp Union GraphExp {
+}
+| GraphExp Intersect GraphExp {
+}
+| GraphExp Difference GraphExp {
+}
+| Complement GraphExp {
+}
+; 
+Graph : '[' NVList ']' {
+	$$ = $2;
+}
+;
+NVList : NVList ',' NV {
+	(*$$)[$3->first] = $3->second;
+	delete $3;
+}
+| NV {
+	$$ = new unordered_map<int, vector<int> >();
+	(*$$)[$1->first] = $1->second;
+	delete $1;
+}
+;
+NV : '(' NodeId ',' '[' NodeList ']' ')' {
+	$$ = new pair<int, vector<int>>();
+	$$->first = $2;
+	$$->second = *$5;
+	delete $5;
+}
+;
+NodeList: NodeList ',' NodeId {
+	$$->push_back($3);
+}
+| NodeId { 
+	$$ = new vector<int>();
+	$$->push_back($1);
+}
+| %empty { } 
+;
+%%
+
+int main() {
+
+//	yydebug = 1;
+	yyparse();
+	return 0;
+}

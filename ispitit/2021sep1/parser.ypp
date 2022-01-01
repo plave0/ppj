@@ -1,0 +1,110 @@
+
+%{
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <map>
+
+#include "mat.hpp"
+
+#define YYDEBUG 1
+
+using namespace std;
+
+extern int yylex();
+
+void yyerror(string msg) {
+	cout << "syntax error: " << msg << endl;
+	exit(EXIT_FAILURE);
+}
+
+map<string, Matrix> id_table;
+%}
+
+%union {
+	Matrix* m;
+	vector<double>* vd;
+	string* s;
+	double d;
+}
+
+%token Asgn Print Reshape Count Subarray Link Fork Eq Sum Length
+%token <m> Array
+%token <s> Id
+%token <d> Num
+
+%type <m> E M Rs
+%type <vs> R
+
+%left '+' '-' '*'
+
+%start P
+
+%%
+P : P S ';' { } 
+  | S ';' { }
+  ;
+S : A { }
+  | F { } 
+  | L { }
+  ; 
+A : Array Id Asgn E {
+	id_table[*$2] = *$4;
+	delete $2;
+	delete $4;
+  }
+  ;
+F : Print '(' E ')' {
+	$3->print();
+  }
+  | Reshape '(' '[' Num ',' Num ']' ',' Id ')'
+  ;
+L : E Eq E
+  ;
+E : E '+' E
+  | E '-' E 
+  | E '*' E
+  | E '*' Num
+  | Subarray '(' E ',' E ')'
+  | Link '(' E ',' E ')'
+  | Fork '(' E ',' E ',' E ')'
+  | Count '(' Num ')'
+  | Reshape '(' '[' Num ',' Num ']' ',' E ')'
+  | Sum '(' E ')'
+  | Length '(' E ')'
+  | M
+  | Num
+  ;
+M : '[' Rs ']' {
+	$$ = $2;
+  }
+  | Id {
+	$$ = new Matrix(id_table[*$1]);
+	delete $1;
+  }
+  ;
+Rs : Rs ',' R
+  | R {
+	$$ = new Matrix();
+	$$->push_back($1);
+	delete $1;
+  }
+  ; 
+R : R Num {
+	$1->push_back($2);
+	$$ = $1;
+  }
+  | Num {
+	$$ = new vector();
+	$$->push_back($1);
+  }
+  ; 
+%%
+
+int main() {
+
+	yydebug = 1;
+	yyparse();
+	return 0;
+}
