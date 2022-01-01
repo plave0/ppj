@@ -1,0 +1,8 @@
+# exec files
+run
+
+# temp files
+**.tab.**
+**.yy.**
+*.output
+*.o
