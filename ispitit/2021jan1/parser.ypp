@@ -21,7 +21,7 @@ void yyerror(string msg) {
 #include "parser.tab.hpp"
 
 map< string, Angle > id_table;
-map< string, vector<Angle>* > list_id_table;
+map< string, vector<Angle> > list_id_table;
 
 %}
 
@@ -47,19 +47,23 @@ map< string, vector<Angle>* > list_id_table;
 
 Prog : Prog Line ';'
 | Line ';'
+;
+
+
 Line : Print '(' AngleExp ')' {
 	$3->print();
 	cout << endl;
 }
 | Print '(' ListId ')' {
 	cout << '[';
-	int n = list_id_table[*$3]->size();
+	int n = list_id_table[*$3].size();
 	for(int i = 0; i < n-1; i += 1) {
-		(*list_id_table[*$3])[i].print();
+		list_id_table[*$3][i].print();
 		cout << ", ";
 	}
-	(*list_id_table[*$3])[n-1].print();
+	list_id_table[*$3][n-1].print();
 	cout << ']' << endl;
+	delete $3;
 }	
 		
 | AngleId '=' AngleExp {
@@ -68,13 +72,17 @@ Line : Print '(' AngleExp ')' {
 	delete $3;
 }
 | ListId '=' AngleList {
-	list_id_table[*$1] = $3;
+	list_id_table[*$1] = *$3;
 	delete $1;
+	delete $3;
 }
 | AngleExp {
 	$1->print();
+	delete $1;
 }
 ;
+
+
 AngleExp : AngleExp '+' AngleExp {
 	$$ = $1->sum($3);
 	delete $1;
@@ -97,19 +105,25 @@ AngleExp : AngleExp '+' AngleExp {
 	$$ = $2;
 }
 | ListId '[' Num ']' {
-	$$ = new Angle((*list_id_table[*$1])[$3]);
+	$$ = new Angle(list_id_table[*$1][$3]);
+	delete $1;
 }
 | Angle {
 	$$ = $1;
 }
 | AngleId {
 	$$ = new Angle(id_table[*$1]);
+	delete $1;
 }
 ; 
+
+
 AngleList : '[' Angles ']' {
 	$$ = $2;
 }
 ;
+
+
 Angles : Angles ',' AngleExp {
 	$$ = $1;
 	$$->push_back(*$3);
@@ -121,11 +135,14 @@ Angles : Angles ',' AngleExp {
 	delete $1;
 }
 ;
+
+
 Angle : '<' Num ',' Num ',' Num '>' {
 	
 	$$ = new Angle($2, $4, $6);
 }
 ;
+
 
 %%
 
