@@ -1,0 +1,17 @@
+run: lex.yy.o parser.tab.o angle.o
+	g++ -o $@ $^
+lex.yy.o : lex.yy.c parser.tab.hpp
+	g++ -c -o $@ $<
+lex.yy.c: lexer.lex
+	flex $<
+parser.tab.o: parser.tab.cpp
+	g++ -c -o $@ $<
+parser.tab.cpp parser.tab.hpp: parser.ypp
+	bison -d -v $<
+angle.o: angle.cpp angle.hpp
+	g++ -c -o $@ $<
+
+.PHONY: clena
+
+clean: 
+	rm -rf *.tab.* *.yy.* *.output *.o
