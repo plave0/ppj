@@ -6,3 +6,6 @@ run
 **.yy.**
 *.output
 *.o
+
+# Python
+**/venv
