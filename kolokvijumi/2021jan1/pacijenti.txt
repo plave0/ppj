@@ -1,0 +1,7 @@
+1; Petar Peric; 05.06.1965; ne; Phizer, Sputnjik-V; hipertenzija, dijabetes-tip2
+2; Ana Anica Peric; 05.02.1970; da; SinoPharm; tromboflija
+3; Ziks Zikic; 25.10.1940; ne; Sputnjik-V, SinoPharm, Phizer; hipertenzija, reuma, alergija-polen
+4; Mika Mikic; 10.12.2010; ne; Sputnjik-V; alergija-penicilin
+5; Mina Minic; 11.11.2000; da; Phizer; dijabetes-tip1, astma
+6; Laza Lazic; 05.07.1985; ne; SinoPharm, Phizer; lupus
+7; Mika; 1.8.1930; da; Phizer, Sputnjik, Sinopharm;
