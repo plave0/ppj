@@ -1,0 +1,40 @@
+<pacijent rbr="1">
+	<klinika>Pulmologija</klinika>
+	<odeljenje>IV/11</odeljenje>
+	<o2>maska:10l</o2>
+	<ime>Pera Peric</ime>
+	<bp>COVID19/23-01</bp>
+	<drodjenja>05/06/1980</drodjenja>
+	<dprijema>23/01/2021</dprijema>
+	<stanje>srednje tesko</stanje>
+</pacijent>
+<pacijent rbr="2">
+	<odeljenje>XIV/03</odeljenje>
+	<ime>Mika Mikic</ime>
+	<klinika>Banjica</klinika>
+	<bp>COVID19/01-12</bp>
+	<drodjenja>03/07/1930</drodjenja>
+	<stanje>tesko</stanje>
+	<dprijema>01/12/2020</dprijema>
+	<o2>maska:20l</o2>
+</pacijent>
+<pacijent rbr="3">
+	<ime>Zika Zikic</ime>
+	<klinika>Infektivna</klinika>
+	<odeljenje>V/20</odeljenje>
+	<drodjenja>16/03/1990</drodjenja>
+	<bp>COVID19/05-02</bp>
+	<dprijema>05/02/2021</dprijema>
+	<stanje>lakse</stanje>
+	<o2>ne</o2>
+</pacijent>
+<pacijent rbr="4">
+	<odeljenje>II/15</odeljenje>
+	<ime>Laza Lazic</ime>
+	<klinika>Batajnica</klinika>
+	<bp>COVID19/15-11</bp>
+	<drodjenja>11/12/1965</drodjenja>
+	<stanje>zivotno ugrozen</stanje>
+	<dprijema>15/11/2020</dprijema>
+	<o2>respirator</o2>
+</pacijent>
