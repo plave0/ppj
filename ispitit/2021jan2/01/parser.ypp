@@ -1,0 +1,122 @@
+%{
+#include <iostream>
+#include <cstdlib>
+#include <string>
+#include <map>
+
+#define YYDEBUG 1
+
+using namespace std;
+
+extern int yylex();
+void yyerror(string msg) {
+	cerr << msg << endl;
+	exit(EXIT_FAILURE);
+}
+
+#include "vec.hpp"
+#include "parser.tab.hpp"
+
+map<string, Vec> id_table;
+
+%}
+
+%union {
+	double num;
+	Vec* vector;
+	string* id;
+}
+
+%token AsgnOp Print Def 
+%token Sim RefX RefY
+%token <id> Id
+%token <num> Num
+
+%type <vector> VecExp
+
+%left '+' '-'
+%left '*'
+%left UMINUS
+
+%start Prog
+
+%%
+
+Prog : Prog Line '\n'
+| Line '\n'
+;
+
+Line : Id AsgnOp VecExp {
+	id_table[*$1] = *$3;
+	delete $1;
+	delete $3;
+}
+| Print '(' VecExp ')' {
+	$3->print();
+	delete $3;
+}
+;
+
+VecExp : Def '(' '<' Num ',' Num '>' ',' '<' Num ',' Num '>' ')' {
+	
+	$$ = new Vec($4, $6, $10, $12);
+}
+| VecExp '+' VecExp {
+	$$ = new Vec($1->sum(*$3));
+	delete $1;
+	delete $3;
+}
+| VecExp '-' VecExp {
+	$$ = new Vec($1->sub(*$3));
+	delete $1;
+	delete $3;
+}
+| '-' VecExp %prec UMINUS {
+	$$ = new Vec($2->inv());	
+	delete $2;
+}
+| Num '*' VecExp {
+	$$ = new Vec($3->mul($1));
+	delete $3;
+}
+| VecExp '*' Num {
+	$$ = new Vec($1->mul($3));
+	delete $1;
+}
+| '(' VecExp ')' {
+	$$ = $2;
+}
+| Sim '(' VecExp ')' {
+	$$ = new Vec($3->sim());
+	delete $3;
+}
+| RefX '(' VecExp ')' {
+	$$ = new Vec($3->refX());
+	delete $3;
+}
+| RefY '(' VecExp ')' {
+	$$ = new Vec($3->refY());
+	delete $3;
+}
+| Id {
+	$$ = new Vec(id_table[*$1]);
+	if(id_table.find(*$1) != id_table.end()) {
+		$$ = new Vec(id_table[*$1]);
+	}
+	else {
+		cerr << "variable not defined" << endl;
+		exit(EXIT_FAILURE);
+	}
+	delete $1;
+}
+;
+
+%%
+
+int main() {
+	
+	yydebug = 1;
+	yyparse();
+
+	return 0;
+}
