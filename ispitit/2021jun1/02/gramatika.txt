@@ -1,0 +1,10 @@
+Prog -> Line Prog	{Id, Print}
+| eps			{EOF}
+
+Line -> Id AsgnOp StrExp	{Id}
+| Print '(' StrExp ')'		{Print}
+
+StrExp -> Str		{Str}
+| Id			{Id}
+
+
