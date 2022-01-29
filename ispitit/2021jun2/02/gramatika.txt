@@ -1,0 +1,85 @@
+# Gramatika
+
+Prog -> Line ; Prog
+| Eps
+
+Line -> Graph Id = GraphExp
+| Print ( GraphExp )
+
+GraphExp -> [ VertexList ]
+| Id
+
+VertexList -> VertexList , Vertex
+| Vertex
+
+Vertex -> ( VertexId , [ EdgeList ] )
+| ( VertexId , [ ] )
+
+EdgeList -> EdgeList , VertexId
+| VertexId
+
+# Gramatika bez leve faktorizacije
+
+Vertex -> ( VertexId , [ EdgeList ] )
+| ( VertexId , [ ] )
+
+===
+
+Vertex -> ( VertexId , [ Vertex'
+Vertex' -> EdgleList ] )
+| ] )
+
+# Eliminacja leve rekurzije
+
+1. 
+VertexList -> VertexList , Vertex
+| Vertex
+
+===
+
+VertexList -> Vertex VertexList'
+VertexList' -> , Vertex
+| Eps
+
+2.
+EdgeList -> EdgeList , VertexId
+| VertexId
+
+===
+
+EdgleList -> VertexId EdgleList'
+EdgeList' -> , VertexId
+| Eps
+
+# Sređena gramatika
+
+
+Prog -> Line ; Prog
+| Eps
+
+Line -> Graph Id = GraphExp
+| Print ( GraphExp )
+
+GraphExp -> [ VertexList ]
+| Id
+
+VertexList -> Vertex VertexList'
+VertexList' -> , Vertex
+| Eps
+
+Vertex -> ( VertexId , [ Vertex'
+Vertex' -> EdgleList ] )
+| ] )
+
+EdgleList -> VertexId EdgleList'
+EdgeList' -> , VertexId
+| Eps
+
+# First i Follow tabilca :
+
+Prog:
+Line:
+GraphExp:
+VertexList:
+VertexList':
+
